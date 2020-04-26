@@ -1,6 +1,5 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
-#![allow(dead_code)]
 
 use crate::token::*;
 use crate::dictionary::*;
@@ -90,11 +89,6 @@ impl Scanner {
         self.state_ = State::NONE;
     }
 
-    fn errorToken(&mut self, msg: &String) {
-        eprintln!("Token Error:{}", msg);
-        self.errorFlag_ = true;
-    }
-
     fn getNextChar(&mut self) {
         let mut buffer = [0; 1];
         match self.file_.read_exact(&mut buffer) {
@@ -128,9 +122,13 @@ impl Scanner {
         self.buffer_.pop();
     }
 
-    fn errorReport(&mut self, msg: String) {
-        eprintln!("Token Error: {}{}", self.getTokenLocation().toString(), msg);
+    fn errorToken(&mut self, msg: &String) {
+        eprintln!("Token Error:{}", msg);
         self.errorFlag_ = true;
+    }
+
+    fn errorReport(&mut self, msg: &String) {
+        self.errorToken(&format!("Token Error: {}{}", self.getTokenLocation().toString(), msg));
     }
 
     fn handleLineComment(&mut self) {
@@ -159,7 +157,7 @@ impl Scanner {
 
             while !(self.currentChar_ == '*' && self.getPeekChar() == '/') {
                 if self.eofFlag_ {
-                    self.errorReport(format!("end of file happended in comment, */ is expected!, but find {}", self.currentChar_));
+                    self.errorReport(&format!("end of file happended in comment, */ is expected!, but find {}", self.currentChar_));
                 }
 
                 self.getNextChar();
@@ -268,7 +266,7 @@ impl Scanner {
         }
 
         if !readFlag {
-            self.errorReport("Hexadecimal number format error.".to_string());
+            self.errorReport(&"Hexadecimal number format error.".to_string());
         }
     }
 
@@ -283,13 +281,13 @@ impl Scanner {
 
         if !readFlag
         {
-            self.errorReport("Octal number format error.".to_string());
+            self.errorReport(&"Octal number format error.".to_string());
         }
     }
 
     fn handleFraction(&mut self) {
         if !self.currentChar_.is_ascii_digit() {
-            self.errorReport("Fraction number part should be numbers".to_string());
+            self.errorReport(&"Fraction number part should be numbers".to_string());
         }
 
         self.addToBuffer(self.currentChar_);
@@ -306,7 +304,7 @@ impl Scanner {
         self.getNextChar();
 
         while self.currentChar_ != '+' && self.currentChar_ != '-' && !self.currentChar_.is_ascii_digit() {
-            self.errorReport(format!("Scientist presentation number after e / E should be + / - or digits but find
+            self.errorReport(&format!("Scientist presentation number after e / E should be + / - or digits but find
                         \'{}\'", self.currentChar_));
         }
 
@@ -371,25 +369,25 @@ impl Scanner {
 
             if self.currentChar_ == '.' {
                 if isFloat {
-                    self.errorReport("Fraction number can not have more than one dot.".to_string());
+                    self.errorReport(&"Fraction number can not have more than one dot.".to_string());
                 }
 
                 if isExponent {
-                    self.errorReport("Scientist number representation in MJava can not have dot.".to_string());
+                    self.errorReport(&"Scientist number representation in MJava can not have dot.".to_string());
                 }
 
                 if numberBase == 16 {
-                    self.errorReport("Hexadecimal number in MJava can only be integer.".to_string());
+                    self.errorReport(&"Hexadecimal number in MJava can only be integer.".to_string());
                 }
 
                 if numberBase == 8 {
-                    self.errorReport("Octal number in MJava can only be integer.".to_string());
+                    self.errorReport(&"Octal number in MJava can only be integer.".to_string());
                 }
 
                 numberState = NumberState::FRACTION;
             } else if self.currentChar_ == 'E' || self.currentChar_ == 'e' {
                 if isExponent {
-                    self.errorReport("Scientist presentation can not have more than one e / E".to_string());
+                    self.errorReport(&"Scientist presentation can not have more than one e / E".to_string());
                 }
 
                 numberState = NumberState::EXPONENT;
@@ -407,7 +405,7 @@ impl Scanner {
             if isFloat || isExponent {
                 let realValue: f64 = match self.buffer_.parse::<f64>() {
                     Err(err) => {
-                        self.errorReport(format!("When parse floating-point number literal \"{}\", because {}, an error
+                        self.errorReport(&format!("When parse floating-point number literal \"{}\", because {}, an error
                                     occurred.", self.buffer_, err.to_string()));
                         self.buffer_.clear();
                         self.state_ = State::NONE;
@@ -420,7 +418,7 @@ impl Scanner {
             } else {
                 let intValue: i32 = match i32::from_str_radix(&self.buffer_.clone(), numberBase) {
                     Err(err) => {
-                        self.errorReport(format!("When parse integer literal \"{}\", because {}, an error occurred.", self.buffer_,
+                        self.errorReport(&format!("When parse integer literal \"{}\", because {}, an error occurred.", self.buffer_,
                                 err.to_string()));
                         self.buffer_.clear();
                         self.state_ = State::NONE;
@@ -449,7 +447,7 @@ impl Scanner {
             }
 
             if self.eofFlag_ {
-                self.errorReport(format!("end of file happended in string, \' is expected!, but find {}",
+                self.errorReport(&format!("end of file happended in string, \' is expected!, but find {}",
                             self.currentChar_));
                 break;
             }
@@ -467,7 +465,7 @@ impl Scanner {
             let ch = self.buffer_.chars().next().unwrap();
             self.makeCharToken(self.loc_.to_owned(), self.buffer_.clone(), ch);
         } else {
-            self.errorReport("Char can contain only one character!".to_string());
+            self.errorReport(&"Char can contain only one character!".to_string());
             self.buffer_.clear();
             self.state_ = State::NONE;
         }
@@ -480,7 +478,7 @@ impl Scanner {
 
         loop {
             if self.eofFlag_ {
-                self.errorReport(format!("end of file happended in string, \" is expected!, but find {}",
+                self.errorReport(&format!("end of file happended in string, \" is expected!, but find {}",
                             self.currentChar_));
                 break;
             }

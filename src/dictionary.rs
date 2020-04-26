@@ -1,5 +1,4 @@
 #![allow(non_snake_case)]
-#![allow(dead_code)]
 
 use crate::token::*;
 use std::collections::HashMap;
@@ -54,6 +53,7 @@ impl Dictionary {
         dic
     }
 
+    #[allow(dead_code)]
     pub fn addToken(&mut self, name: String, info: (TokenValue, TokenType, i32)) {
         self.dictionary_.insert(name, info);
     }

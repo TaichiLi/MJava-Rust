@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
-#![allow(dead_code)]
 
+#[allow(dead_code)]
 #[derive(Copy, Clone)]
 pub enum TokenType {
     // in fact, we can put these 5 types to one category
@@ -21,6 +21,7 @@ pub enum TokenType {
     UNKNOWN,
 }
 
+#[allow(dead_code)]
 #[derive(Copy, Clone)]
 pub enum TokenValue {
     // keyword
@@ -123,6 +124,7 @@ impl Default for Token {
     }
 }
 
+#[allow(dead_code)]
 impl Token {
     pub fn new() -> Self {
         Token {
@@ -184,12 +186,12 @@ impl Token {
     pub fn getTokenType(&self) -> TokenType {
         self.type_
     }
-    
+
     pub fn toString(&self) -> String {
         format!("{} Token Type: {} Token Name: {}", self.location_.toString(),
                 self.tokenTypeDescription(), self.name_)
     }
-    
+
     fn tokenTypeDescription(&self) -> String {
         let buffer = match self.type_ {
             TokenType::INTEGER => "integer",
