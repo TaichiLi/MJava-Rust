@@ -114,10 +114,10 @@ impl Scanner {
         let mut buffer = [0; 1];
         match self.file_.read_exact(&mut buffer) {
             Err(_e) => self.eofFlag_ = true,
-            Ok(()) => self.currentChar_ = buffer[0].into(),
+            Ok(()) => {},
         };
         self.file_.seek(SeekFrom::Current(-1)).unwrap();
-        self.currentChar_
+        buffer[0].into()
     }
 
     fn addToBuffer(&mut self, ch: char) {
@@ -174,14 +174,14 @@ impl Scanner {
 
     fn preprocess(&mut self) {
         loop {
-            while self.currentChar_.is_ascii_whitespace() {
+            while self.currentChar_.is_ascii_whitespace() && !self.eofFlag_ {
                 self.getNextChar();
             }
 
             self.handleLineComment();
             self.handleBlockComment();
 
-            if !(self.currentChar_.is_ascii_whitespace() || self.currentChar_ == '/') {
+            if !(self.currentChar_.is_ascii_whitespace() || self.currentChar_ == '/') || self.eofFlag_ {
                 break;
             }
         }
@@ -192,7 +192,7 @@ impl Scanner {
     }
 
     pub fn getNextToken(&mut self) -> Token {
-        let mut matched = false;
+        let mut matched;
 
         loop {
             self.errorFlag_ = false;
@@ -249,7 +249,6 @@ impl Scanner {
     }
 
     fn handleDigit(&mut self) {
-        println!("current char: {}", self.currentChar_);
         self.addToBuffer(self.currentChar_);
         self.getNextChar();
 
@@ -257,8 +256,6 @@ impl Scanner {
             self.addToBuffer(self.currentChar_);
             self.getNextChar();
         }
-
-        println!("literal: {}", self.buffer_);
     }
 
     fn handleXDigit(&mut self) {
@@ -321,7 +318,6 @@ impl Scanner {
 
 
     fn handleNumberState(&mut self) {
-        println!("number: {}", self.currentChar_);
         self.loc_ = self.getTokenLocation();
 
         let mut isFloat = false;
@@ -346,7 +342,7 @@ impl Scanner {
             INTERGER,
             FRACTION,
             EXPONENT,
-            DONE
+            DONE,
         }
 
         let mut numberState = NumberState::INTERGER;
@@ -413,7 +409,9 @@ impl Scanner {
                     Err(err) => {
                         self.errorReport(format!("When parse floating-point number literal \"{}\", because {}, an error
                                     occurred.", self.buffer_, err.to_string()));
-                        0.0
+                        self.buffer_.clear();
+                        self.state_ = State::NONE;
+                        std::f64::MAX
                     },
                     Ok(realValue) => realValue,
                 };
@@ -424,7 +422,9 @@ impl Scanner {
                     Err(err) => {
                         self.errorReport(format!("When parse integer literal \"{}\", because {}, an error occurred.", self.buffer_,
                                 err.to_string()));
-                        0
+                        self.buffer_.clear();
+                        self.state_ = State::NONE;
+                        std::i32::MAX
                     },
                     Ok(intValue) => intValue,
                 };

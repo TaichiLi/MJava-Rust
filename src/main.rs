@@ -1,9 +1,9 @@
+#![allow(non_snake_case)]
 mod token;
 mod dictionary;
 mod scanner;
 use crate::token::*;
 use crate::scanner::*;
-use std::error::Error;
 use std::env;
 use std::fs::File;
 use std::io::prelude::*;
