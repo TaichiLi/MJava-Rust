@@ -1,5 +1,3 @@
-#![allow(non_snake_case)]
-
 use crate::token::*;
 use std::collections::HashMap;
 
@@ -10,7 +8,7 @@ pub struct Dictionary {
 
 impl Dictionary {
     /// Get the default dictionary, which has already inserted reserved word.
-    pub fn getDictionary() -> Dictionary {
+    pub fn get_dictionary() -> Dictionary {
         let mut dic = Dictionary {
             dictionary_: HashMap::new(),
         };
@@ -57,7 +55,7 @@ impl Dictionary {
 
     #[allow(dead_code)]
     /// Add token to dictionary.
-    pub fn addToken(&mut self, name: String, info: (TokenValue, TokenType, i32)) {
+    pub fn add_token(&mut self, name: String, info: (TokenValue, TokenType, i32)) {
         self.dictionary_.insert(name, info);
     }
 
@@ -67,8 +65,8 @@ impl Dictionary {
     ///
     /// if not, return the default tuple, which is `(TokenValue::UNRESERVED, TokenType::IDENTIFIER, -1)`.
     pub fn lookup(&self, name: &String) -> (TokenValue, TokenType, i32) {
-        let tokenValue = TokenValue::UNRESERVED;
-        let tokenType  = TokenType::IDENTIFIER;
+        let token_value = TokenValue::UNRESERVED;
+        let token_type  = TokenType::IDENTIFIER;
         let precedence = -1;
 
         if self.dictionary_.contains_key(name) {
@@ -76,11 +74,11 @@ impl Dictionary {
             return *info;
         }
 
-        (tokenValue, tokenType, precedence)
+        (token_value, token_type, precedence)
     }
 
     /// Check if name exists.
-    pub fn haveToken(&self, name: &String) -> bool {
+    pub fn have_token(&self, name: &String) -> bool {
         self.dictionary_.contains_key(name)
     }
 }

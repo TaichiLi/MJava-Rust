@@ -1,7 +1,5 @@
-#![allow(non_snake_case)]
-#![allow(non_camel_case_types)]
-
 #[allow(dead_code)]
+#[allow(non_camel_case_types)]
 #[derive(Copy, Clone)]
 /// The type of token
 pub enum TokenType {
@@ -104,22 +102,22 @@ pub enum TokenValue {
 #[derive(Clone)]
 /// The location of token
 pub struct TokenLocation {
-    fileName_: String,
+    file_name_: String,
     line_: i32,
     column_: i32
 }
 
 impl TokenLocation {
-    pub fn new(fileName: String, line: i32, column: i32) -> Self {
+    pub fn new(file_name: String, line: i32, column: i32) -> Self {
         TokenLocation {
-            fileName_: fileName,
+            file_name_: file_name,
             line_: line,
             column_: column,
         }
     }
 
-    pub fn toString(&self) -> String {
-        format!("{}:{}:{}:", self.fileName_, self.line_, self.column_)
+    pub fn to_string(&self) -> String {
+        format!("{}:{}:{}:", self.file_name_, self.line_, self.column_)
     }
 }
 
@@ -130,12 +128,12 @@ pub struct Token {
     value_: TokenValue,
     location_: TokenLocation,
     name_: String,
-    symbolPrecedence_: i32,
+    symbol_precedence_: i32,
 
-    intValue_: i32,
-    realValue_: f64,
-    charValue_: char,
-    strValue_: String
+    int_value_: i32,
+    real_value_: f64,
+    char_value_: char,
+    str_value_: String
 }
 
 impl Default for Token {
@@ -145,11 +143,11 @@ impl Default for Token {
             value_: TokenValue::UNRESERVED,
             location_: Default::default(),
             name_: Default::default(),
-            symbolPrecedence_: -1,
-            intValue_: Default::default(),
-            realValue_: Default::default(),
-            charValue_: Default::default(),
-            strValue_: Default::default(),
+            symbol_precedence_: -1,
+            int_value_: Default::default(),
+            real_value_: Default::default(),
+            char_value_: Default::default(),
+            str_value_: Default::default(),
         }
     }
 }
@@ -164,71 +162,71 @@ impl Token {
     }
 
     /// New one `IDENTIFIER` or `KEYWORD` token.
-    pub fn newToken(tokenType: TokenType, tokenValue: TokenValue, loc: TokenLocation, name: String, symbolPrecedence: i32) -> Self {
+    pub fn new_token(token_type: TokenType, token_value: TokenValue, loc: TokenLocation, name: String, symbol_precedence: i32) -> Self {
         Token {
-            type_: tokenType,
-            value_: tokenValue,
+            type_: token_type,
+            value_: token_value,
             location_: loc,
             name_: name,
-            symbolPrecedence_: symbolPrecedence,
+            symbol_precedence_: symbol_precedence,
             ..Default::default()
         }
     }
 
     /// New one `INTEGER_LITERAL` token.
-    pub fn newIntToken(loc: TokenLocation, name: String, intValue: i32) -> Self {
+    pub fn new_int_token(loc: TokenLocation, name: String, int_value: i32) -> Self {
         Token {
             type_: TokenType::INTEGER_LITERAL,
             location_: loc,
             name_: name,
-            intValue_: intValue,
+            int_value_: int_value,
             ..Default::default()
         }
     }
 
     /// New one`REAL_LITERAL` token.
-    pub fn newRealToken(loc: TokenLocation, name: String, realValue: f64) -> Self {
+    pub fn new_real_token(loc: TokenLocation, name: String, real_value: f64) -> Self {
         Token {
             type_: TokenType::REAL_LITERAL,
             location_: loc,
             name_: name,
-            realValue_: realValue,
+            real_value_: real_value,
             ..Default::default()
         }
     }
 
     /// New one `CHAR_LITERAL` token.
-    pub fn newCharToken(loc: TokenLocation, name: String, charValue: char) -> Self {
+    pub fn new_char_token(loc: TokenLocation, name: String, char_value: char) -> Self {
         Token {
             type_: TokenType::CHAR_LITERAL,
             location_: loc,
             name_: name,
-            charValue_: charValue,
+            char_value_: char_value,
             ..Default::default()
         }
     }
 
     /// New one `STRING_LITERAL` token.
-    pub fn newStrToken(loc: TokenLocation, name: String, strValue: String) -> Self {
+    pub fn new_str_token(loc: TokenLocation, name: String, str_value: String) -> Self {
         Token {
             type_: TokenType::STRING_LITERAL,
             location_: loc,
             name_: name,
-            strValue_: strValue,
+            str_value_: str_value,
             ..Default::default()
         }
     }
 
-    pub fn getTokenType(&self) -> TokenType {
+    pub fn get_token_type(&self) -> TokenType {
         self.type_
     }
 
-    pub fn toString(&self) -> String {
-        format!("{} Token Type: {} Token Name: {}", self.location_.toString(),
-                self.tokenTypeDescription(), self.name_)
+    pub fn to_string(&self) -> String {
+        format!("{} Token Type: {} Token Name: {}", self.location_.to_string(),
+                self.token_type_description(), self.name_)
     }
 
-    fn tokenTypeDescription(&self) -> String {
+    fn token_type_description(&self) -> String {
         let buffer = match self.type_ {
             TokenType::INTEGER_LITERAL => "integer",
             TokenType::BOOLEAN_LITERAL => "boolean",

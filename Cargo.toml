@@ -1,5 +1,5 @@
 [package]
-name = "MJava-Rust"
+name = "mjava-rust"
 description = "A MJava Compiler front-end implemented by Rust"
 version = "0.1.0"
 authors = ["Li Taiji <496289688@qq.com>"]
