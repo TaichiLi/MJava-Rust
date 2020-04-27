@@ -3,11 +3,13 @@
 use crate::token::*;
 use std::collections::HashMap;
 
+/// Dictionary of token
 pub struct Dictionary {
     dictionary_: HashMap<String, (TokenValue, TokenType, i32)>,
 }
 
 impl Dictionary {
+    /// Get the default dictionary, which has already inserted reserved word.
     pub fn getDictionary() -> Dictionary {
         let mut dic = Dictionary {
             dictionary_: HashMap::new(),
@@ -44,8 +46,8 @@ impl Dictionary {
         dic.dictionary_.insert("length".to_string(), (TokenValue::LENGTH, TokenType::KEYWORD, -1));
         dic.dictionary_.insert("this".to_string(), (TokenValue::THIS, TokenType::KEYWORD, -1));
         dic.dictionary_.insert("new".to_string(), (TokenValue::NEW, TokenType::KEYWORD, -1));
-        dic.dictionary_.insert("true".to_string(), (TokenValue::TRUE, TokenType::BOOLEAN, -1));
-        dic.dictionary_.insert("false".to_string(), (TokenValue::FALSE, TokenType::BOOLEAN, -1));
+        dic.dictionary_.insert("true".to_string(), (TokenValue::TRUE, TokenType::BOOLEAN_LITERAL, -1));
+        dic.dictionary_.insert("false".to_string(), (TokenValue::FALSE, TokenType::BOOLEAN_LITERAL, -1));
         dic.dictionary_.insert("int".to_string(), (TokenValue::INT, TokenType::TYPE, -1));
         dic.dictionary_.insert("char".to_string(), (TokenValue::CHAR, TokenType::TYPE, -1));
         dic.dictionary_.insert("String".to_string(), (TokenValue::STRING, TokenType::TYPE, -1));
@@ -54,10 +56,16 @@ impl Dictionary {
     }
 
     #[allow(dead_code)]
+    /// Add token to dictionary.
     pub fn addToken(&mut self, name: String, info: (TokenValue, TokenType, i32)) {
         self.dictionary_.insert(name, info);
     }
 
+    /// Find out if name exists,and return `(TokenValue, TokenType, precedence)`.
+    ///
+    /// if so, return the corresponding tuple,
+    ///
+    /// if not, return the default tuple, which is `(TokenValue::UNRESERVED, TokenType::IDENTIFIER, -1)`.
     pub fn lookup(&self, name: &String) -> (TokenValue, TokenType, i32) {
         let tokenValue = TokenValue::UNRESERVED;
         let tokenType  = TokenType::IDENTIFIER;
@@ -71,6 +79,7 @@ impl Dictionary {
         (tokenValue, tokenType, precedence)
     }
 
+    /// Check if name exists.
     pub fn haveToken(&self, name: &String) -> bool {
         self.dictionary_.contains_key(name)
     }

@@ -3,28 +3,39 @@
 
 #[allow(dead_code)]
 #[derive(Copy, Clone)]
+/// The type of token
 pub enum TokenType {
-    // in fact, we can put these 5 types to one category
-    // named constant. but I want to make it cleaner.
-    INTEGER,        // such as 3, 4 and so on
-    BOOLEAN,        // true or false.
-    REAL,           // such as 3.14
-    CHAR_LITERAL,   // such as 'a','b'
-    STRING_LITERAL, // such as "hello world"
-
-    IDENTIFIER,     // such as abc
-    KEYWORD,       // such as if
-    TYPE,           // such as int
-    OPERATOR,      // such as  + - * /
-    DELIMITER,      // such as ,
-    END_OF_FILE,    // end of file
+    /// such as `3`, `4` and so on
+    INTEGER_LITERAL,
+    /// `true` or `false`
+    BOOLEAN_LITERAL,
+    /// such as `3.14`
+    REAL_LITERAL,
+    /// such as 'a','b'
+    CHAR_LITERAL,
+    /// such as "hello world"
+    STRING_LITERAL,
+    /// such as `abc`
+    IDENTIFIER,
+    /// such as `if`, `while`
+    KEYWORD,
+    /// such as `int`
+    TYPE,
+    /// such as `+`, `-`, `*`, `<`, `&&`
+    OPERATOR,
+    /// such as `,`, `;`
+    DELIMITER,
+    /// end of file
+    END_OF_FILE,
+    /// other unknown token type
     UNKNOWN,
 }
 
 #[allow(dead_code)]
 #[derive(Copy, Clone)]
+/// The value of token
 pub enum TokenValue {
-    // keyword
+    /// keyword
     CLASS = 0,
     PUBLIC,
     STATIC,
@@ -41,39 +52,57 @@ pub enum TokenValue {
     THIS,
     NEW,
 
-    // type
+    /// type
     DOUBLE,
     INT,
     CHAR,
     STRING,
     BOOL,
 
-    // boolean
+    /// boolean
     TRUE,
     FALSE,
 
-    // symbols
-    LPAREN,             // (
-    RPAREN,             // )
-    LBRACK,             // [
-    RBRACK,             // ]
-    LBRACE,             // {
-    RBRACE,             // }
-    COMMA,              // ,
-    SEMICOLON,          // ;
-    ASSIGN,             // =
-    AND,                // &&
-    LT,                 // <
-    ADD,                // +
-    SUB,                // -
-    MULTI,              // *
-    DOT,                // .
-    NOT,                // !
+    /// symbols
+    /// '('
+    LPAREN,
+    /// ')'
+    RPAREN,
+    /// '['
+    LBRACK,
+    /// '['
+    RBRACK,
+    /// '{'
+    LBRACE,
+    /// '}'
+    RBRACE,
+    /// ','
+    COMMA,
+    /// ';'
+    SEMICOLON,
+    /// '='
+    ASSIGN,
+    /// '&&'
+    AND,
+    /// '<'
+    LT,
+    /// '-'
+    ADD,
+    /// '-'
+    SUB,
+    /// '*'
+    MULTI,
+    /// '.'
+    DOT,
+    /// '!'
+    NOT,
+    /// other token value
     UNRESERVED,
 }
 
 #[derive(Default)]
 #[derive(Clone)]
+/// The location of token
 pub struct TokenLocation {
     fileName_: String,
     line_: i32,
@@ -81,7 +110,7 @@ pub struct TokenLocation {
 }
 
 impl TokenLocation {
-    pub fn new(fileName: String, line: i32, column: i32) -> TokenLocation {
+    pub fn new(fileName: String, line: i32, column: i32) -> Self {
         TokenLocation {
             fileName_: fileName,
             line_: line,
@@ -95,6 +124,7 @@ impl TokenLocation {
 }
 
 #[derive(Clone)]
+/// Lexical token
 pub struct Token {
     type_: TokenType,
     value_: TokenValue,
@@ -126,12 +156,14 @@ impl Default for Token {
 
 #[allow(dead_code)]
 impl Token {
+    /// Default constructor
     pub fn new() -> Self {
         Token {
             ..Default::default()
         }
     }
 
+    /// New one `IDENTIFIER` or `KEYWORD` token.
     pub fn newToken(tokenType: TokenType, tokenValue: TokenValue, loc: TokenLocation, name: String, symbolPrecedence: i32) -> Self {
         Token {
             type_: tokenType,
@@ -143,9 +175,10 @@ impl Token {
         }
     }
 
+    /// New one `INTEGER_LITERAL` token.
     pub fn newIntToken(loc: TokenLocation, name: String, intValue: i32) -> Self {
         Token {
-            type_: TokenType::INTEGER,
+            type_: TokenType::INTEGER_LITERAL,
             location_: loc,
             name_: name,
             intValue_: intValue,
@@ -153,9 +186,10 @@ impl Token {
         }
     }
 
+    /// New one`REAL_LITERAL` token.
     pub fn newRealToken(loc: TokenLocation, name: String, realValue: f64) -> Self {
         Token {
-            type_: TokenType::REAL,
+            type_: TokenType::REAL_LITERAL,
             location_: loc,
             name_: name,
             realValue_: realValue,
@@ -163,6 +197,7 @@ impl Token {
         }
     }
 
+    /// New one `CHAR_LITERAL` token.
     pub fn newCharToken(loc: TokenLocation, name: String, charValue: char) -> Self {
         Token {
             type_: TokenType::CHAR_LITERAL,
@@ -173,6 +208,7 @@ impl Token {
         }
     }
 
+    /// New one `STRING_LITERAL` token.
     pub fn newStrToken(loc: TokenLocation, name: String, strValue: String) -> Self {
         Token {
             type_: TokenType::STRING_LITERAL,
@@ -194,9 +230,9 @@ impl Token {
 
     fn tokenTypeDescription(&self) -> String {
         let buffer = match self.type_ {
-            TokenType::INTEGER => "integer",
-            TokenType::BOOLEAN => "boolean",
-            TokenType::REAL => "real",
+            TokenType::INTEGER_LITERAL => "integer",
+            TokenType::BOOLEAN_LITERAL => "boolean",
+            TokenType::REAL_LITERAL => "real",
             TokenType::CHAR_LITERAL => "char literal",
             TokenType::STRING_LITERAL => "string literal",
             TokenType::IDENTIFIER => "identifier",
@@ -207,6 +243,7 @@ impl Token {
             TokenType::END_OF_FILE => "eof",
             TokenType::UNKNOWN => "unknown",
         };
+
         buffer.to_string()
     }
 }

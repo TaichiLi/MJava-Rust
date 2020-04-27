@@ -7,16 +7,26 @@ use std::io::prelude::*;
 use std::fs::File;
 use std::io::SeekFrom;
 
+/// The state of lexical analysis.
 enum State {
-    NONE = 0,
+    /// original state
+    NONE,
+    /// end of file
     END_OF_FILE,
+    /// parse `TokenType::IDENTIFIER`
     IDENTIFIER,
+    /// parse `TokenLocation::INTERGER_LITERAL` or `TokenType::REAL_LITERAL`
     NUMBER,
+    /// parse `TokenType::CHAR_LITERAL`
     CHAR_LITERAL,
+    /// parse `TokenType::STRING_LITERAL`
     STRING_LITERAL,
+    /// parse `TokenType::OPERATION` or `TokenType::DELIMITER`
     OPERATION,
 }
 
+
+/// Lexical scanner
 pub struct Scanner {
     fileName_: String,
     file_: File,
@@ -33,6 +43,13 @@ pub struct Scanner {
 }
 
 impl Scanner {
+    /// New scanner by the name of source file.
+    ///
+    /// # Examples
+    /// ```
+    /// let source_file_name = "./test.mjava";
+    /// let mut scanner = Scanner::new(source_file_name);
+    /// ```
     pub fn new(fileName: String) -> Self {
         let file = match File::open(fileName.clone()) {
             Err(err) => panic!("When trying to open file {}, because {}, an occurred error.", err.to_string(), fileName),
@@ -55,7 +72,7 @@ impl Scanner {
         }
     }
 
-    pub fn getTokenLocation(&self) -> TokenLocation {
+    fn getTokenLocation(&self) -> TokenLocation {
         TokenLocation::new(self.fileName_.to_owned(), self.line_, self.column_)
     }
 
@@ -92,7 +109,10 @@ impl Scanner {
     fn getNextChar(&mut self) {
         let mut buffer = [0; 1];
         match self.file_.read_exact(&mut buffer) {
-            Err(_e) => self.eofFlag_ = true,
+            Err(_e) => {
+                self.eofFlag_ = true;
+                self.currentChar_ = std::char::MAX;
+            },
             Ok(()) => self.currentChar_ = buffer[0].into(),
         }
 
@@ -108,7 +128,7 @@ impl Scanner {
         let mut buffer = [0; 1];
         match self.file_.read_exact(&mut buffer) {
             Err(_e) => self.eofFlag_ = true,
-            Ok(()) => {},
+            Ok(()) => buffer[0] = std::u8::MAX,
         };
         self.file_.seek(SeekFrom::Current(-1)).unwrap();
         buffer[0].into()
@@ -185,10 +205,25 @@ impl Scanner {
         }
     }
 
+    /// Get the current token.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let scanner = Scanner::new("/test.mjava");
+    /// let token = scanner.getToken();
+    /// ```
     pub fn getToken(&self) -> Token {
         self.token_.to_owned()
     }
 
+    /// Get the next token.
+    ///
+    /// # Examples
+    /// ```
+    /// let scanner = Scanner::new("./test.mjava");
+    /// let token = scanner.getNextToken();
+    /// ```
     pub fn getNextToken(&mut self) -> Token {
         let mut matched;
 
